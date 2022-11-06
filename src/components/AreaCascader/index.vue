@@ -15,6 +15,12 @@ const props = withDefaults(
   }
 )
 
+const config = ref({
+  emitPath: false
+})
+
+const areaRef = ref()
+
 const emit = defineEmits<{
   (e: 'update:modelValue', modelValue: number): void
   (e: 'select', path: string[]): void
@@ -26,27 +32,17 @@ const current = computed({
   },
   set: (value) => {
     emit('update:modelValue', value)
+    const node = areaRef.value.getCheckedNodes()[0] as CascaderNode
+    if (node) {
+      emit('select', [...Array.from(new Set(node.pathLabels))])
+    }
   }
 })
-
-const config = ref({
-  emitPath: false
-})
-
-const area = ref(null)
-const handleChange = (value: number) => {
-  emit('update:modelValue', value)
-  // TODO
-  const node = (area?.value as any).getCheckedNodes()?.[0] as CascaderNode
-  if (node) {
-    emit('select', [...new Set(node.pathLabels)])
-  }
-}
 </script>
 
 <template>
   <el-cascader
-    ref="area"
+    ref="areaRef"
     v-model="current"
     :props="config"
     :options="options"
@@ -54,7 +50,6 @@ const handleChange = (value: number) => {
     filterable
     clearable
     class="area-cascader"
-    @change="handleChange"
   />
 </template>
 

@@ -1,11 +1,7 @@
-import { AxiosResponse } from 'axios'
-import { IParams, ITable } from '../type'
-import { IForm, IQuery } from '../type/receipt'
+import { Receipt } from '../type/receipt'
 import request from '../utils/request'
 
-export function getReceiptList(
-  params: IParams & IQuery
-): Promise<AxiosResponse<ITable<IForm>>> {
+export function getReceiptList(params: Params): Promise<any> {
   return request({
     url: '/receipts',
     method: 'get',
@@ -14,7 +10,7 @@ export function getReceiptList(
 }
 
 // 新增
-export function addReceipt(data: IForm) {
+export function addReceipt(data: Receipt): Promise<any> {
   return request({
     url: '/receipts',
     method: 'POST',
@@ -23,7 +19,7 @@ export function addReceipt(data: IForm) {
 }
 
 // 修改
-export function editReceipt(data: IForm) {
+export function editReceipt(data: Receipt): Promise<any> {
   const { id } = data
   return request({
     url: `/receipts/${id}`,
@@ -33,9 +29,18 @@ export function editReceipt(data: IForm) {
 }
 
 // 删除
-export function delReceipt(id: number) {
+export function delReceipt(id: number): Promise<any> {
   return request({
     url: `/receipts/${id}`,
     method: 'DELETE'
   })
 }
+
+const receiptApi = {
+  getReceiptList,
+  addReceipt,
+  editReceipt,
+  delReceipt
+}
+
+export default receiptApi

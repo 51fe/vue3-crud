@@ -14,7 +14,7 @@ const props = withDefaults(
   }
 )
 const emit = defineEmits<{
-  (e: 'update:modelValue', modelValue: ValueType): void
+  (e: 'update:modelValue', value: ValueType): void
 }>()
 
 const current = computed({
@@ -33,10 +33,9 @@ const current = computed({
     :placeholder="placeholder"
     clearable
     class="base-date-picker"
-    @input="emit('update:modelValue', modelValue as ValueType)"
   />
 </template>
-<style lang="less">
+<style lang="scss">
 .base-date-picker {
   &.el-date-editor {
     &.el-input, .el-input__wrapper {

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly by default 1`] = `
+"<div class="pagination-container">
+  <div role="pagination" aria-label="pagination" class="el-pagination"><span class="el-pagination__total is-first" disabled="false">共 32 条</span><span class="el-pagination__sizes"><div class="el-select el-select--default"><div class="select-trigger el-tooltip__trigger el-tooltip__trigger"><!--v-if--><div class="el-input el-input--default el-input--suffix"><!-- input --><!-- prepend slot --><!--v-if--><div class="el-input__wrapper"><!-- prefix slot --><!--v-if--><input class="el-input__inner" type="text" readonly="" autocomplete="off" tabindex="0" placeholder="请选择"><!-- suffix slot --><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-icon el-select__caret el-select__icon"><svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M831.872 340.864 512 652.672 192.128 340.864a30.592 30.592 0 0 0-42.752 0 29.12 29.12 0 0 0 0 41.6L489.664 714.24a32 32 0 0 0 44.672 0l340.288-331.712a29.12 29.12 0 0 0 0-41.728 30.592 30.592 0 0 0-42.752 0z"></path></svg></i><!--v-if--><!--v-if--><!--v-if--><!--v-if--><!--v-if--><!--v-if--></span></span></div><!-- append slot -->
+  <!--v-if-->
+</div>
+</div>
+<!--teleport start-->
+<!--teleport end-->
+</div></span><button type="button" class="btn-prev" disabled="" aria-disabled="true"><i class="el-icon"><svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+      <path fill="currentColor" d="M609.408 149.376 277.76 489.6a32 32 0 0 0 0 44.672l331.648 340.352a29.12 29.12 0 0 0 41.728 0 30.592 30.592 0 0 0 0-42.752L339.264 511.936l311.872-319.872a30.592 30.592 0 0 0 0-42.688 29.12 29.12 0 0 0-41.728 0z"></path>
+    </svg></i></button>
+<ul class="el-pager">
+  <li class="is-active number" aria-current="true" tabindex="0"> 1 </li>
+  <!--v-if-->
+  <li class="number" aria-current="false" tabindex="0">2</li>
+  <!--v-if-->
+  <li class="number" aria-current="false" tabindex="0">3</li>
+</ul><button type="button" class="btn-next" aria-disabled="false"><i class="el-icon"><svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+      <path fill="currentColor" d="M340.864 149.312a30.592 30.592 0 0 0 0 42.752L652.736 512 340.864 831.872a30.592 30.592 0 0 0 0 42.752 29.12 29.12 0 0 0 41.728 0L714.24 534.336a32 32 0 0 0 0-44.672L382.592 149.376a29.12 29.12 0 0 0-41.728 0z"></path>
+    </svg></i></button><span class="el-pagination__jump is-last" disabled="false">前往 <div class="el-input el-input--small el-pagination__editor is-in-pagination"><!-- input --><!-- prepend slot --><!--v-if--><div class="el-input__wrapper"><!-- prefix slot --><!--v-if--><input class="el-input__inner" min="1" max="3" type="number" autocomplete="off" tabindex="0"><!-- suffix slot --><!--v-if--></div><!-- append slot --><!--v-if--></div> 页</span></div>
+</div>"
+`;

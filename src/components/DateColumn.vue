@@ -14,7 +14,7 @@ withDefaults(
 <template>
   <el-table-column
     v-bind="$attrs"
-    min-width="90"
+    min-width="100"
     sortable
     show-overflow-tooltip
   >

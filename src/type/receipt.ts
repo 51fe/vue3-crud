@@ -1,16 +1,16 @@
-export interface IForm {
+export interface Receipt {
   id?: number
   date?: string
   userName?: string
   area?: number
   areaName?: string
   address?: string
-  mobile?: number
+  mobile?: string
 }
 
-export interface IQuery {
+export interface ReceiptQuery {
   userName_like?: string
-  mobile_like?: number
+  mobile_like?: string
   date_gte?: string
   date_lte?: string
   areaName_like?: string

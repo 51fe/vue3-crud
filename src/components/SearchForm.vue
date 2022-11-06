@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref, toRef, watch } from 'vue'
-import { IQuery } from '../type/receipt'
+import { ReceiptQuery } from '../type/receipt'
 import { Search } from '@element-plus/icons-vue'
 import area from '../components/AreaCascader/area'
+import BaseInput from './BaseInput.vue'
 import BaseDatePicker from './BaseDatePicker.vue'
-import BaseSelect, { IOption } from './BaseSelect.vue'
+import BaseSelect from './BaseSelect.vue'
 
-interface ICity extends IOption {
-  children?: IOption[]
-}
-
-const query: IQuery = reactive({})
+const form: ReceiptQuery = reactive({})
 const provinces = computed(() => {
   return area.map((item) => {
     return {
@@ -20,17 +17,17 @@ const provinces = computed(() => {
   })
 })
 
-let cities = ref<ICity[]>([])
-let areas = ref<IOption[]>([])
-const provice = toRef(query, 'areaName_like')
+let cities = ref<Option[]>([])
+let areas = ref<Option[]>([])
+const provice = toRef(form, 'areaName_like')
 watch(provice, (newValue, oldValue) => {
   const children = area.find((item) => item.label === newValue)?.children
   if (children) {
     if (oldValue) {
-      query.area_like = undefined
-      query.area = undefined
+      form.area_like = undefined
+      form.area = undefined
       areas.value = []
-      query.area = undefined
+      form.area = undefined
     }
     cities.value = children?.map((item) => {
       return {
@@ -41,7 +38,7 @@ watch(provice, (newValue, oldValue) => {
     })
   }
 })
-const city = toRef(query, 'area_like')
+const city = toRef(form, 'area_like')
 watch(city, (newValue, oldValue) => {
   if (newValue) {
     const children = cities.value.find(
@@ -49,7 +46,7 @@ watch(city, (newValue, oldValue) => {
     )?.children
     if (children) {
       if (oldValue) {
-        query.area = undefined
+        form.area = undefined
       }
       areas.value = children
     }
@@ -57,48 +54,54 @@ watch(city, (newValue, oldValue) => {
 })
 
 const emit = defineEmits<{
-  (e: 'search', query: IQuery): void
+  (e: 'search', query: ReceiptQuery): void;
 }>()
+
+const handleSearch = () => {
+  emit('search', form)
+}
 </script>
 <template>
-  <dl class="search-form">
+  <dl
+    class="search-form"
+    data-testid="search-form"
+    @keyup.enter="handleSearch"
+  >
     <dd class="item">
-      <el-input
-        v-model="query.userName_like"
+      <BaseInput
+        v-model="form.userName_like"
         placeholder="请输入姓名"
-        clearable
       />
-      <el-input
-        v-model="query.mobile_like"
+      <BaseInput
+        v-model="form.mobile_like"
         placeholder="请输入手机号"
-        clearable
       />
     </dd>
     <dd class="item date-item">
-      <base-date-picker
-        v-model="query.date_gte"
+      <BaseDatePicker
+        v-model="form.date_gte"
         placeholder="开始日期"
       />
-      <base-date-picker
-        v-model="query.date_lte"
+      <BaseDatePicker
+        v-model="form.date_lte"
         placeholder="结束日期"
       />
     </dd>
     <dd class="item">
-      <base-select
-        v-model="query.areaName_like"
+      <BaseSelect
+        v-model="form.areaName_like"
         :options="provinces"
         placeholder="请选择省"
       />
-      <base-select
-        v-model="query.area_like"
+      <BaseSelect
+        v-model="form.area_like"
         :options="cities"
         placeholder="请选择市"
       />
     </dd>
     <dd class="item">
-      <base-select
-        v-model="query.area"
+      <BaseSelect
+        v-model="form.area"
         :options="areas"
         placeholder="请选择区"
       />
@@ -106,13 +109,14 @@ const emit = defineEmits<{
         type="primary"
         plain
         :icon="Search"
-        @click="emit('search', query)"
+        title="搜索"
+        @click="handleSearch"
       />
     </dd>
   </dl>
 </template>
 
-<style lang="less">
+<style lang="scss">
 .search-form {
   display: flex;
   flex-wrap: wrap;

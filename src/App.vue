@@ -1,31 +1,39 @@
 <script setup lang="ts">
-import { IParams } from './type'
-import { IForm, IQuery } from './type/receipt'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watchEffect
+} from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { debounce } from 'lodash'
+import { Receipt, ReceiptQuery } from './type/receipt'
 import SearchForm from './components/SearchForm.vue'
 import SaveForm from './components/SaveForm.vue'
 import BasePagination from './components/BasePagination.vue'
 import DateColumn from './components/DateColumn.vue'
-import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import {
   addReceipt,
   delReceipt,
   editReceipt,
   getReceiptList
 } from './api/receipt'
-type FormKey = keyof IForm
-type SearchParams = IParams & IQuery
+type FormKey = keyof Receipt
+type SearchParams = Params & ReceiptQuery
 const dialogVisible = ref(false)
-let index = -1
 const adding = ref(false)
 const loading = ref(false)
-const cudLoading = ref(false)
-let form = reactive<IForm>({})
-const tableData = ref<IForm[]>([])
-let params = reactive<SearchParams>({
+const saveLoading = ref(false)
+let form = reactive<Receipt>({})
+const tableData = ref<Receipt[]>([])
+const PAGE_SIZE = 15
+const tableHeight = ref(0)
+let params = reactive<Params>({
   _page: 1,
-  _limit: 15,
+  _limit: PAGE_SIZE,
   _sort: 'id',
   _order: 'desc'
 })
@@ -35,16 +43,41 @@ const title = computed<string>(() => {
   if (adding.value) return '新增收货'
   return '编辑收货'
 })
-watchEffect(() => {
-  const loading = cudLoading.value
-  if (!loading) {
-    dialogVisible.value = false
-  }
-})
 
-onMounted(() => {
-  if (window.screen.width < 767) {
-    layout.value = 'total, prev, pager, next'
+const fetchData = (params: SearchParams) => {
+  loading.value = true
+  getReceiptList(params)
+    .then((data: PageTable<Receipt>) => {
+      loading.value = false
+      tableData.value = data.list ?? []
+      total.value = data.total
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+const handleSearch = (keyword?: ReceiptQuery) => {
+  // merge params
+  const value = {
+    ...params,
+    _page: 1,
+    ...keyword
+  }
+  fetchData(value)
+}
+
+handleSearch()
+
+// fetch first page data
+const refresh = () => {
+  params._page = 1
+  fetchData(params)
+}
+
+watchEffect(() => {
+  if (!saveLoading.value) {
+    dialogVisible.value = false
   }
 })
 
@@ -58,98 +91,104 @@ const toAdd = () => {
   })
 }
 
-const toEdit = (row: IForm, idx: number) => {
+const toEdit = (row: Receipt) => {
   adding.value = false
   dialogVisible.value = true
-  index = idx
   form = Object.assign(form, row)
 }
 
-const toDelete = (id: number, index: number) => {
+const toDelete = (id: number) => {
   ElMessageBox.confirm('确定删除?', {
-    type: 'warning'
+    title: '提示',
+    type: 'warning',
+    confirmButtonText: '确定',
+    beforeClose: (action, instance, done) => {
+      if (action === 'confirm') {
+        instance.confirmButtonLoading = true
+        instance.confirmButtonText = '执行中...'
+        delReceipt(id).then(() => {
+          instance.confirmButtonLoading = false
+          done()
+          // not call fetchData
+          const index = tableData.value.findIndex((item) => item.id === id)
+          tableData.value.splice(index, 1)
+          total.value -= 1
+          if (total.value % params._limit === 0) {
+            refresh()
+          }
+        })
+      } else {
+        done()
+      }
+    }
   })
-    .then(() => {
-      doDelete(id, index)
-    })
-    .catch(() => {
-      console.log('canceled')
-    })
-}
-const fetchData = (params: SearchParams) => {
-  loading.value = true
-  getReceiptList(params)
-    .then(({ data }) => {
-      loading.value = false
-      tableData.value = data.list ?? []
-      total.value = data.total
-    })
-    .catch(() => {
-      loading.value = false
-    })
-}
-fetchData(params)
-const handleSearch = (keyword: IQuery) => {
-  // merge params
-  params = {
-    ...params,
-    ...keyword
-  }
-  fetchData(params)
 }
 
-const doAdd = (params: IForm) => {
-  cudLoading.value = true
-  addReceipt(params)
-    .then((data) => {
-      cudLoading.value = false
-      // not call fetchData
-      tableData.value.unshift(data as IForm)
-      total.value += 1
-    })
-    .catch(() => {
-      cudLoading.value = false
-    })
-}
-
-const doEdit = (params: IForm) => {
-  cudLoading.value = true
-  editReceipt(params)
-    .then((data) => {
-      cudLoading.value = false
-      // not call fetchData
-      tableData.value.splice(index, 1, data as IForm)
-    })
-    .catch(() => {
-      cudLoading.value = false
-    })
-}
-
-const doDelete = async (id: number, index: number) => {
-  cudLoading.value = false
-  delReceipt(id)
-    .then(() => {
-      cudLoading.value = false
-      // not call fetchData
-      tableData.value.splice(index, 1)
-      total.value -= 1
-    })
-    .catch(() => {
-      cudLoading.value = false
-    })
-}
-const handleSubmit = () => {
+const handleSubmit = (form: Receipt) => {
   if (adding.value) {
     doAdd(form)
   } else {
     doEdit(form)
   }
 }
+
+const doAdd = (params: Receipt) => {
+  saveLoading.value = true
+  addReceipt(params)
+    .then(() => {
+      saveLoading.value = false
+      refresh()
+    })
+    .catch(() => {
+      saveLoading.value = false
+    })
+}
+
+const doEdit = (data: Receipt) => {
+  saveLoading.value = true
+  editReceipt(data)
+    .then(() => {
+      saveLoading.value = false
+      // not call fetchData
+      const index = tableData.value.findIndex((item) => item.id === data.id)
+      if (index !== -1) {
+        tableData.value.splice(index, 1, data as Receipt)
+      }
+    })
+    .catch(() => {
+      saveLoading.value = false
+    })
+}
+
+const responsive = () => {
+  if (document.body.clientWidth < 768) {
+    layout.value = 'prev, pager, next'
+  } else {
+    layout.value = undefined
+  }
+  const el = document.getElementById('searchForm') as HTMLElement
+  tableHeight.value = document.body.clientHeight - el.clientHeight - 140
+}
+
+onMounted(() => {
+  window.addEventListener('resize', debounce(responsive, 500))
+  // not relayout when testing
+  if (process.env.NODE_ENV !== 'test') {
+    responsive()
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', responsive)
+})
 </script>
 
 <template>
   <div id="app">
-    <search-form @search="handleSearch" />
+    <SearchForm
+      id="searchForm"
+      @search="handleSearch"
+    />
     <div class="box">
       <el-button
         type="primary"
@@ -159,74 +198,73 @@ const handleSubmit = () => {
         新增
       </el-button>
     </div>
-    <section class="wrapper">
-      <el-table
-        v-loading="loading"
-        :data="tableData"
-        :border="true"
+    <el-table
+      v-loading="loading"
+      :data="tableData"
+      :border="true"
+      :height="tableHeight"
+      class="main-table"
+    >
+      <DateColumn
+        prop="date"
+        label="日期"
+      />
+      <el-table-column
+        prop="userName"
+        label="姓名"
+        sortable
+      />
+      <el-table-column
+        prop="areaName"
+        label="省市区"
+        sortable
+        min-width="100"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="address"
+        label="地址"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="mobile"
+        label="手机号码"
+        min-width="120"
+      />
+      <el-table-column
+        v-if="tableData.length > 0"
+        :fixed="layout ? 'right' : false"
+        label="操作"
+        width="120"
+        align="center"
       >
-        <date-column
-          prop="date"
-          label="日期"
-        />
-        <el-table-column
-          prop="userName"
-          label="姓名"
-          sortable
-        />
-        <el-table-column
-          prop="areaName"
-          label="省市区"
-          sortable
-          show-overflow-tooltip
-        />
-        <el-table-column
-          prop="address"
-          label="地址"
-          show-overflow-tooltip
-        />
-        <el-table-column
-          prop="mobile"
-          label="手机号码"
-          min-width="100"
-        />
-        <el-table-column
-          v-if="tableData.length > 0"
-          fixed="right"
-          label="操作"
-          width="120"
-          align="center"
-        >
-          <template #default="{ row, $index }">
-            <el-tag
-              type="warning"
-              @click="toDelete(row.id, $index)"
-            >
-              删除
-            </el-tag>
-            <el-tag
-              @click="toEdit(row, $index)"
-            >
-              编辑
-            </el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
-    </section>
+        <template #default="{ row }">
+          <el-tag
+            type="warning"
+            @click="toDelete(row.id)"
+          >
+            删除
+          </el-tag>
+          <el-tag @click="toEdit(row)">
+            编辑
+          </el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
     <el-dialog
       v-model="dialogVisible"
       :title="title"
       :close-on-click-modal="false"
     >
-      <save-form
-        v-model="form"
+      <SaveForm
+        :value="form"
         :opened="dialogVisible"
-        :loading="cudLoading"
+        :loading="saveLoading"
         @submit="handleSubmit"
         @cancel="dialogVisible = false"
       />
     </el-dialog>
-    <base-pagination
+    <BasePagination
       v-model:page="params._page"
       v-model:limit="params._limit"
       :total="total"
@@ -236,11 +274,10 @@ const handleSubmit = () => {
   </div>
 </template>
 
-<style lang="less">
+<style>
 #app {
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-sizing: border-box;
 }
 </style>

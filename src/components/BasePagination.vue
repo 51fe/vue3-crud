@@ -15,9 +15,8 @@ const props = withDefaults(
   {
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 15,
     layout: 'total, sizes, prev, pager, next, jumper',
-    background: true,
     autoScroll: true
   }
 )
@@ -67,13 +66,14 @@ function handleCurrentChange(val: number) {
       :layout="layout"
       :page-sizes="[15, 30, 50, 100]"
       :total="total"
+      :background="background"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
   </div>
 </template>
 
-<style lang="less">
+<style lang="scss">
 .pagination-container {
   display: flex;
   clear: both;

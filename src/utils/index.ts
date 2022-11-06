@@ -1,3 +1,5 @@
+import { nextTick } from 'vue'
+
 /**
  * Parse the time to string
  * @param {(Date|string|number)} time
@@ -5,7 +7,7 @@
  * @returns {string | null}
  */
 export function parseDateTime(
-  time: Date | string | number,
+  time?: Date | string | number,
   format = '{y}-{m}-{d} {h}:{i}:{s}'
 ): string | null {
   if (arguments.length === 0 || !time) {
@@ -69,13 +71,56 @@ export function parseDateTime(
  * @returns {string}
  */
 export function getLabel(
-  list: {
+  list?: {
     label: string
     value: string | number
   }[],
-  value: string | number
+  value?: string | number
 ): string {
   const found = list?.find((item) => item.value === value)
   if (found) return found.label
   return ''
+}
+
+/**
+ * 根据区码查找区名
+ * @param list
+ * @param value
+ * @returns {string}
+ */
+export function getAreaNameByCode(list?: Option[], value?: number): string {
+  if (Array.isArray(list)) {
+    for (const item of list) {
+      if (item.value === value) {
+        return item.label
+      } else if (item.children && item?.children?.length > 0) {
+        return getAreaNameByCode(item.children, value)
+      }
+    }
+  }
+  return ''
+}
+
+/**
+ * 简单深度拷贝
+ * @param data
+ * @returns {any}
+ */
+export function deepClone(data: object) {
+  return JSON.parse(JSON.stringify(data))
+}
+
+/**
+ * in order to test transitions, we need to use
+ * await rAF() after firing transition events.
+ */
+export const rAF = async () => {
+  return new Promise((res) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(async () => {
+        res(null)
+        await nextTick()
+      })
+    })
+  })
 }

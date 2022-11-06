@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_API
+  baseURL: (import.meta as ImportMeta).env.VITE_APP_BASE_API
 })
 
 // request拦截器
@@ -30,12 +30,12 @@ service.interceptors.response.use(
     const { data, status, config, headers, statusText } = response
     if (status < 200 || status > 300) {
       ElMessage({
-        message: getAction(config) || statusText,
+        message: statusText,
         type: 'error',
         duration: 5 * 1000
       })
     } else {
-      const action = getAction(config)
+      const action = getAction(config, status)
       if (action) {
         ElMessage({
           message: action + '成功',
@@ -45,10 +45,8 @@ service.interceptors.response.use(
       const count = headers['x-total-count']
       if (count) {
         return {
-          data: {
-            list: data,
-            total: parseInt(count)
-          }
+          list: data,
+          total: parseInt(count)
         }
       }
       return data
@@ -64,13 +62,17 @@ service.interceptors.response.use(
   }
 )
 
-function getAction(config: AxiosRequestConfig) {
-  const method = config?.method?.toLocaleLowerCase() ?? ''
+function getAction (config: AxiosRequestConfig, status: number) {
   let action = ''
-  if (method === 'put') {
-    action = '修改'
-  } else if (method === 'delete') {
-    action = '删除'
+  if(status === 201) {
+    action = '新增'
+  } else {
+    const method = config?.method?.toLocaleLowerCase() ?? ''
+    if (method === 'put') {
+      action = '修改'
+    } else if (method === 'delete') {
+      action = '删除'
+    }
   }
   return action
 }

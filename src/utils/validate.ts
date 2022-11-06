@@ -1,26 +1,14 @@
-/**
- * phone niumber validator
- * @param rule
- * @param value
- * @param callback
- */
-export function mobileValidator(
-  rule: unknown,
-  value: string,
-  callback: (e?: Error) => void
-) {
-  const reg = /^[1][345789][0-9]{9}$/
-  if (value) {
-    if (!reg.test(value)) {
-      callback(new Error('请输入正确的手机号'))
-    } else {
-      callback()
-    }
-  } else {
-    callback()
-  }
+interface Rules {
+  [key: string]: FormItemRule[];      
 }
 
-export default {
-  mobileValidator
+export const rules: Rules  = {
+  date: [{ required: true, message: '日期不能为空' }],
+  userName: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
+  area: [{ required: true, message: '市区不能为空'}],
+  address: [{ required: true, message: '地址不能为空', trigger: 'blur' }],
+  mobile: [
+    { required: true, message: '手机号不能为空', trigger: 'blur' },
+    { message: '请输入正确的手机号', pattern: /^[1][345789][0-9]{9}$/ }
+  ]
 }

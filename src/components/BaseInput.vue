@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 
-type ValueType = string | number
-
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    modelValue?: ValueType
+    modelValue?: string
     placeholder?: string
   }>(),
   {
@@ -15,26 +12,17 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', modelValue: ValueType): void
+  (e: 'update:modelValue', modelValue: string): void
 }>()
-
-const current = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    emit('update:modelValue', value as ValueType)
-  }
-})
 </script>
 <template>
   <el-input
-    v-model="current"
+    :model-value="modelValue"
     :max-length="200"
     :placeholder="placeholder"
     clearable
     class="base-input"
-    @input="$emit('update:modelValue', $event)"
+    @input="emit('update:modelValue', $event)"
   />
 </template>
 <style>

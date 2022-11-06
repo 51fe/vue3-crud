@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly by default 1`] = `
+"<div class="el-input el-input--suffix base-input">
+  <!-- input -->
+  <!-- prepend slot -->
+  <!--v-if-->
+  <div class="el-input__wrapper">
+    <!-- prefix slot -->
+    <!--v-if--><input class="el-input__inner" max-length="200" type="text" autocomplete="off" tabindex="0" placeholder="请输入"><!-- suffix slot -->
+    <!--v-if-->
+  </div><!-- append slot -->
+  <!--v-if-->
+</div>"
+`;

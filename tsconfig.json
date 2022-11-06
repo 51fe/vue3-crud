@@ -12,9 +12,9 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "types": ["element-plus/global"]
+    "typeRoots": ["node_modules/@types", "src/type"],
+    "types": ["jsdom", "element-plus/global"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/__tests__/App.spec.hs", "src/components/__tests__/SearchForm.spec.hs", "src/components/__tests__/SaveForm.spec.hs"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
-

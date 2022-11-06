@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-export interface IOption {
-  label: string
-  value: number | string
+export interface BaseSelectProps {
+  modelValue?: SelectValue
+  options: Option[]
+  multiple?: boolean
+  placeholder?: string
 }
 
-type ValueType = number | string | number[] | string[]
-
 const props = withDefaults(
-  defineProps<{
-    modelValue?: ValueType
-    options: IOption[]
-    multiple?: boolean
-    placeholder?: string
-  }>(),
+  defineProps<BaseSelectProps>(),
   {
     modelValue: undefined,
     placeholder: '请选择'
@@ -22,25 +17,27 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: ValueType): void
+  (e: 'update:modelValue', value: SelectValue): void
 }>()
+
+const toNumber = (str: string) => isNaN?.(Number(str)) ? str : Number(str)
 
 const current = computed({
   get: () => {
     const value = props.modelValue
     if (value && typeof value === 'string') {
       if (props.multiple) {
-        return value?.split(',')
+        return value.split(',').map(item => toNumber(item))
       }
-      const result = parseInt(value)
-      if (!isNaN(result)) {
-        return result
-      }
+      return toNumber(value)
     }
     return value
   },
   set: (value) => {
-    emit('update:modelValue', value as ValueType)
+    if(props.multiple && Array.isArray(value)) {
+      value = value.join(',')
+    }
+    emit('update:modelValue', value as SelectValue)
   }
 })
 </script>
@@ -55,8 +52,8 @@ const current = computed({
     class="base-select"
   >
     <el-option
-      v-for="(item, index) in options"
-      :key="index"
+      v-for="item in options"
+      :key="item.value"
       :label="item.label"
       :value="item.value"
     />
