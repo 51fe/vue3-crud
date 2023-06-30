@@ -21,7 +21,9 @@ describe('parseDateTime', () => {
 
   test('returns a format date string if format parameter is set', () => {
     const date = new Date(2022, 7, 15, 0, 0, 0)
-    expect(parseDateTime(date, '{y}年{m}月{d}日 {h}时{i}分{s}秒')).toBe('2022年08月15日 00时00分00秒')
+    expect(parseDateTime(date, '{y}年{m}月{d}日 {h}时{i}分{s}秒')).toBe(
+      '2022年08月15日 00时00分00秒'
+    )
   })
 })
 
@@ -32,50 +34,62 @@ describe('getLabel', () => {
   })
 
   test('returns empty string if not found', () => {
-    const list = [{
-      value: 1,
-      label: '移动'
-    }, {
-      value: 2,
-      label: '联通'
-    }, {
-      value: 3,
-      label: '电信'
-    }]
-    expect(getLabel(list , 0)).toBe('')
+    const list = [
+      {
+        value: 1,
+        label: '移动'
+      },
+      {
+        value: 2,
+        label: '联通'
+      },
+      {
+        value: 3,
+        label: '电信'
+      }
+    ]
+    expect(getLabel(list, 0)).toBe('')
   })
 
   test('returns the label by a value from the list', () => {
-    const list = [{
-      value: 1,
-      label: '移动'
-    }, {
-      value: 2,
-      label: '联通'
-    }, {
-      value: 3,
-      label: '电信'
-    }]
+    const list = [
+      {
+        value: 1,
+        label: '移动'
+      },
+      {
+        value: 2,
+        label: '联通'
+      },
+      {
+        value: 3,
+        label: '电信'
+      }
+    ]
     const label = getLabel(list, 1)
     expect(label).toBe('移动')
   })
 })
 
 describe('getAreaNameByCode', () => {
-  const areas = [{
-    value: 440000,
-    label: '广东省',
-    children: [{
-      value: 440300,
-      label: '深圳市',
+  const areas = [
+    {
+      value: 440000,
+      label: '广东省',
       children: [
-        { value: 440303, label: '罗湖区' },
-        { value: 440304, label: '福田区' },
-        { value: 440305, label: '南山区' },
-        { value: 440306, label: '宝安区' }
+        {
+          value: 440300,
+          label: '深圳市',
+          children: [
+            { value: 440303, label: '罗湖区' },
+            { value: 440304, label: '福田区' },
+            { value: 440305, label: '南山区' },
+            { value: 440306, label: '宝安区' }
+          ]
+        }
       ]
-    }]
-  }]
+    }
+  ]
   test('returns empty string if list is undefined or empty', () => {
     expect(getAreaNameByCode([])).toBe('')
     expect(getAreaNameByCode()).toBe('')
@@ -98,21 +112,24 @@ describe('deepClone', () => {
       age: 24
     }
     const cloned = deepClone(person)
-    cloned.age  = 26
+    cloned.age = 26
     expect(person.age).toBe(24)
     expect(cloned).not.toEqual(person)
   })
 
   test('returns a clone array', () => {
-    const persons = [{
-      name: 'tom',
-      age: 24
-    }, {
-      name: 'jerry',
-      age: 25
-    }]
+    const persons = [
+      {
+        name: 'tom',
+        age: 24
+      },
+      {
+        name: 'jerry',
+        age: 25
+      }
+    ]
     const cloned = deepClone(persons)
-    cloned[1].age  = 26
+    cloned[1].age = 26
     expect(persons[0].age).toBe(24)
     expect(cloned).not.toEqual(persons)
   })

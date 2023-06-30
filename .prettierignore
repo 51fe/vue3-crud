@@ -1,0 +1,15 @@
+.git
+.idea
+images
+.eslintignore
+.gitignore
+LICENSE
+.emv
+.nyc_output
+build
+instrumented
+node_modules
+.gitattributes
+yarn.lock
+*.md
+area.ts

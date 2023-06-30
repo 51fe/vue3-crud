@@ -7,10 +7,10 @@ import {
   ref,
   watchEffect
 } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, type Action, type MessageBoxState } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { debounce } from 'lodash'
-import { Receipt, ReceiptQuery } from './type/receipt'
+import { type Receipt, type ReceiptQuery } from './type/receipt'
 import SearchForm from './components/SearchForm.vue'
 import SaveForm from './components/SaveForm.vue'
 import BasePagination from './components/BasePagination.vue'
@@ -21,36 +21,37 @@ import {
   editReceipt,
   getReceiptList
 } from './api/receipt'
-type FormKey = keyof Receipt
+
 type SearchParams = Params & ReceiptQuery
 const dialogVisible = ref(false)
-const adding = ref(false)
 const loading = ref(false)
 const saveLoading = ref(false)
-let form = reactive<Receipt>({})
-const tableData = ref<Receipt[]>([])
+const form = reactive<Receipt>({})
+const tableData = reactive<PageTable<Receipt>>({
+  list: [],
+  total: 0
+})
 const PAGE_SIZE = 15
 const tableHeight = ref(0)
-let params = reactive<Params>({
+const params = reactive<Params>({
   _page: 1,
   _limit: PAGE_SIZE,
   _sort: 'id',
   _order: 'desc'
 })
-const total = ref(0)
 const layout = ref()
 const title = computed<string>(() => {
-  if (adding.value) return '新增收货'
-  return '编辑收货'
+  if (form.id) return '编辑收货'
+  return '新增收货'
 })
 
 const fetchData = (params: SearchParams) => {
   loading.value = true
   getReceiptList(params)
-    .then((data: PageTable<Receipt>) => {
+    .then((data) => {
       loading.value = false
-      tableData.value = data.list ?? []
-      total.value = data.total
+      tableData.list = data.list
+      tableData.total = data.total
     })
     .catch(() => {
       loading.value = false
@@ -82,27 +83,28 @@ watchEffect(() => {
 })
 
 const toAdd = () => {
-  adding.value = true
   dialogVisible.value = true
   // reset form
   Object.keys(form).forEach((item) => {
-    const key = item as FormKey
+    const key = item as keyof Receipt
     form[key] = undefined
   })
 }
 
 const toEdit = (row: Receipt) => {
-  adding.value = false
   dialogVisible.value = true
-  form = Object.assign(form, row)
+  Object.assign(form, row)
 }
-
 const toDelete = (id: number) => {
-  ElMessageBox.confirm('确定删除?', {
+  ElMessageBox.confirm('确定删除？', {
     title: '提示',
     type: 'warning',
     confirmButtonText: '确定',
-    beforeClose: (action, instance, done) => {
+    beforeClose: (
+      action: Action,
+      instance: MessageBoxState,
+      done: () => void
+    ) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '执行中...'
@@ -110,10 +112,11 @@ const toDelete = (id: number) => {
           instance.confirmButtonLoading = false
           done()
           // not call fetchData
-          const index = tableData.value.findIndex((item) => item.id === id)
-          tableData.value.splice(index, 1)
-          total.value -= 1
-          if (total.value % params._limit === 0) {
+          const { list, total } = tableData
+          const index = list.findIndex((item) => item.id === id)
+          list.splice(index, 1)
+          tableData.total -= 1
+          if (total % params._limit === 0) {
             refresh()
           }
         })
@@ -124,17 +127,17 @@ const toDelete = (id: number) => {
   })
 }
 
-const handleSubmit = (form: Receipt) => {
-  if (adding.value) {
-    doAdd(form)
+const handleSubmit = (payload: Receipt) => {
+  if (payload.id) {
+    doEdit(payload)
   } else {
-    doEdit(form)
+    doAdd(payload)
   }
 }
 
-const doAdd = (params: Receipt) => {
+const doAdd = (data: Receipt) => {
   saveLoading.value = true
-  addReceipt(params)
+  addReceipt(data)
     .then(() => {
       saveLoading.value = false
       refresh()
@@ -150,9 +153,10 @@ const doEdit = (data: Receipt) => {
     .then(() => {
       saveLoading.value = false
       // not call fetchData
-      const index = tableData.value.findIndex((item) => item.id === data.id)
+      const list = tableData.list
+      const index = list.findIndex((item) => item.id === data.id)
       if (index !== -1) {
-        tableData.value.splice(index, 1, data as Receipt)
+        list.splice(index, 1, data as Receipt)
       }
     })
     .catch(() => {
@@ -200,7 +204,7 @@ onUnmounted(() => {
     </div>
     <el-table
       v-loading="loading"
-      :data="tableData"
+      :data="tableData.list"
       :border="true"
       :height="tableHeight"
       class="main-table"
@@ -232,7 +236,7 @@ onUnmounted(() => {
         min-width="120"
       />
       <el-table-column
-        v-if="tableData.length > 0"
+        v-if="tableData.list?.length > 0"
         :fixed="layout ? 'right' : false"
         label="操作"
         width="120"
@@ -245,9 +249,7 @@ onUnmounted(() => {
           >
             删除
           </el-tag>
-          <el-tag @click="toEdit(row)">
-            编辑
-          </el-tag>
+          <el-tag @click="toEdit(row)"> 编辑 </el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -258,7 +260,6 @@ onUnmounted(() => {
     >
       <SaveForm
         :value="form"
-        :opened="dialogVisible"
         :loading="saveLoading"
         @submit="handleSubmit"
         @cancel="dialogVisible = false"
@@ -267,7 +268,7 @@ onUnmounted(() => {
     <BasePagination
       v-model:page="params._page"
       v-model:limit="params._limit"
-      :total="total"
+      :total="tableData.total"
       :layout="layout"
       @pagination="fetchData(params)"
     />

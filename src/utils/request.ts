@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 
 // 创建axios实例
@@ -58,13 +58,13 @@ service.interceptors.response.use(
       type: 'error',
       duration: 5 * 1000
     })
-    return Promise.reject(error.code)
+    return error.code
   }
 )
 
-function getAction (config: AxiosRequestConfig, status: number) {
+function getAction(config: AxiosRequestConfig, status: number) {
   let action = ''
-  if(status === 201) {
+  if (status === 201) {
     action = '新增'
   } else {
     const method = config?.method?.toLocaleLowerCase() ?? ''

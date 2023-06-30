@@ -1,4 +1,4 @@
-import { Receipt } from '../type/receipt'
+import { type Receipt } from '../type/receipt'
 import request from '../utils/request'
 
 export function getReceiptList(params: Params): Promise<any> {

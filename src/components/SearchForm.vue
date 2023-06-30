@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, toRef, watch } from 'vue'
-import { ReceiptQuery } from '../type/receipt'
+import { type ReceiptQuery } from '../type/receipt'
 import { Search } from '@element-plus/icons-vue'
 import area from '../components/AreaCascader/area'
 import BaseInput from './BaseInput.vue'
@@ -17,8 +17,8 @@ const provinces = computed(() => {
   })
 })
 
-let cities = ref<Option[]>([])
-let areas = ref<Option[]>([])
+const cities = ref<Option[]>([])
+const areas = ref<Option[]>([])
 const provice = toRef(form, 'areaName_like')
 watch(provice, (newValue, oldValue) => {
   const children = area.find((item) => item.label === newValue)?.children
@@ -54,7 +54,7 @@ watch(city, (newValue, oldValue) => {
 })
 
 const emit = defineEmits<{
-  (e: 'search', query: ReceiptQuery): void;
+  (e: 'search', query: ReceiptQuery): void
 }>()
 
 const handleSearch = () => {
@@ -132,11 +132,11 @@ const handleSearch = () => {
       width: 140px;
     }
 
-    .el-input+.el-input {
+    .el-input + .el-input {
       margin-left: 10px;
     }
 
-    .base-select+.base-select {
+    .base-select + .base-select {
       margin-left: 10px;
     }
 

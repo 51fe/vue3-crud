@@ -15,7 +15,7 @@ test('renders correctly by default', async () => {
   expect(html()).toMatchSnapshot()
 })
 
-test('emits events correctly when click the pager number', async() => {
+test('emits events correctly when click the pager number', async () => {
   const page = 2
   const { emitted } = setUp()
   const numberBtn = screen.getByText(page, { selector: '.number' })
@@ -25,7 +25,7 @@ test('emits events correctly when click the pager number', async() => {
   expect(emitted()['pagination'][0]).toEqual([page])
 })
 
-test('emits events correctly when click the page size item', async() => {
+test('emits events correctly when click the page size item', async () => {
   const limit = 30
   const { emitted } = setUp()
   const item = screen.getByText(new RegExp(`${limit}条/页`))

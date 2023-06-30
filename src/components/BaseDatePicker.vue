@@ -38,7 +38,8 @@ const current = computed({
 <style lang="scss">
 .base-date-picker {
   &.el-date-editor {
-    &.el-input, .el-input__wrapper {
+    &.el-input,
+    .el-input__wrapper {
       width: 100%;
     }
   }

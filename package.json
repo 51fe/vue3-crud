@@ -1,13 +1,15 @@
 {
   "name": "vue3-crud",
   "version": "1.0.0",
-  
   "scripts": {
     "dev": "vite --open",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test:unit": "jest",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit",
+    "lint": "eslint . --ext .vue,.ts,tsx --fix --ignore-path .gitignore",
+    "format": "prettier --write src/",
     "mock": "json-server --watch db.json"
   },
   "dependencies": {
@@ -18,22 +20,26 @@
   "devDependencies": {
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-typescript": "^7.18.6",
+    "@rushstack/eslint-patch": "^1.2.0",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/user-event": "^14.4.3",
     "@testing-library/vue": "^6.6.1",
     "@types/jsdom": "^20.0.0",
+    "@types/node": "^16.11.43",
     "@vitejs/plugin-vue": "^3.1.0",
+    "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
     "@vue/vue3-jest": "^29.1.1",
     "babel-jest": "^29.2.2",
     "eslint": "^8.22.0",
-    "eslint-plugin-vue": "^9.3.0",
+    "eslint-plugin-jest-dom": "^4.0.2",
+    "eslint-plugin-vue": "^9.0.0",
     "jest": "^29.2.0",
     "jest-environment-jsdom": "^29.2.0",
     "jsdom": "^20.0.0",
     "json-server": "^0.17.0",
+    "prettier": "^2.5.1",
     "sass": "^1.55.0",
-    "typescript": "^4.8.4",
+    "typescript": "~4.8.4",
     "vite": "^3.2.1",
     "vue-tsc": "^1.0.9"
   }

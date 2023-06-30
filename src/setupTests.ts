@@ -5,5 +5,5 @@
 import '@testing-library/jest-dom'
 beforeAll(() => {
   jest.spyOn(console, 'warn').mockImplementation(() => {})
-  // jest.spyOn(console, 'log').mockImplementation(() => {})
+  // vi.spyOn(console, 'log').mockImplementation(() => {})
 })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { FormInstance } from 'element-plus'
-import { Receipt } from '../type/receipt'
+import { type Receipt } from '../type/receipt'
 import { nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
-import { rules } from '../utils/validate'
+import rules from '../utils/rules'
 import AreaCascader from './AreaCascader/index.vue'
 import BaseInput from './BaseInput.vue'
 import BaseDatePicker from './BaseDatePicker.vue'
@@ -10,7 +10,6 @@ import BaseDatePicker from './BaseDatePicker.vue'
 const props = defineProps<{
   value: Receipt
   loading?: boolean
-  opened?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,7 +17,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-let form = reactive(props.value)
+const form = reactive(props.value)
 const position = ref<'left' | 'right' | 'top'>('right')
 const ruleFormRef = ref<FormInstance>()
 
@@ -29,20 +28,23 @@ onMounted(() => {
 })
 
 watchEffect(() => {
-  const opened = props.opened
-  if (opened) {
-    nextTick(() => {
-      ruleFormRef.value!.clearValidate()
-    })
-  }
+  Object.assign(form, props.value)
+  nextTick(() => {
+    ruleFormRef.value!.clearValidate()
+  })
 })
 
 const handleSubmit = () => {
   ruleFormRef.value!.validate((valid) => {
     if (valid) {
-      emit('submit', form)
+      emit('submit', { ...form })
     }
   })
+}
+
+const handleCancel = () => {
+  ruleFormRef.value!.clearValidate()
+  emit('cancel')
 }
 </script>
 <template>
@@ -50,8 +52,8 @@ const handleSubmit = () => {
     ref="ruleFormRef"
     :model="form"
     :rules="rules"
-    label-width="80px"
     class="save-form"
+    label-width="80px"
     :label-position="position"
   >
     <el-form-item
@@ -88,9 +90,7 @@ const handleSubmit = () => {
       <BaseInput v-model="form.mobile" />
     </el-form-item>
     <el-form-item class="footer-item">
-      <el-button @click="emit('cancel')">
-        取 消
-      </el-button>
+      <el-button @click="handleCancel"> 取 消 </el-button>
       <el-button
         type="primary"
         :loading="loading"

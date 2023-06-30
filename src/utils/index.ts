@@ -1,5 +1,3 @@
-import { nextTick } from 'vue'
-
 /**
  * Parse the time to string
  * @param {(Date|string|number)} time
@@ -108,19 +106,4 @@ export function getAreaNameByCode(list?: Option[], value?: number): string {
  */
 export function deepClone(data: object) {
   return JSON.parse(JSON.stringify(data))
-}
-
-/**
- * in order to test transitions, we need to use
- * await rAF() after firing transition events.
- */
-export const rAF = async () => {
-  return new Promise((res) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(async () => {
-        res(null)
-        await nextTick()
-      })
-    })
-  })
 }

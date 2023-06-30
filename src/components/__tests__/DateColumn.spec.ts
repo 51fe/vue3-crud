@@ -4,8 +4,7 @@ import DateColumn from '../DateColumn.vue'
 const setUp = (format = '{y}-{m}-{d}') => {
   return render({
     components: { DateColumn },
-    template: 
-    `<el-table :data="[{ date: '2022-08-15 08:00:00' }]">
+    template: `<el-table :data="[{ date: '2022-08-15 08:00:00' }]">
       <date-column prop="date" :format="format" label="日期"></date-column>
     </el-table>`,
     data() {

@@ -8,7 +8,7 @@ test('renders correctly by default', () => {
   expect(picker).toHaveValue('')
 })
 
-test('changes props correctly', async() => {
+test('changes props correctly', async () => {
   const modelValue = '2022-08-15 00:00:00'
   const placeholder = '开始日期'
   render(BaseDatePicker, {
@@ -40,4 +40,3 @@ test('emits input event correctly', async () => {
   const dateTimeStr = parseDateTime(selected, '{y}-{m}-{d} 00:00:00')
   expect(emitted()['update:modelValue'][0]).toEqual([dateTimeStr])
 })
-
