@@ -44,7 +44,6 @@ const current = computed({
 
 <template>
   <el-select
-    id="baseSelect"
     v-model="current"
     :multiple="multiple"
     :placeholder="placeholder"

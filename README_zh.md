@@ -12,7 +12,7 @@
 
 ## 截图
 
-![vue-crud.jpg](https://www.riafan.com/uploads/2208/vue-crud.jpg)
+![vue-crud.jpg](https://51fe.site/uploads/2208/vue-crud.jpg)
 
 ## 项目设置
 

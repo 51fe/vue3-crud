@@ -3,6 +3,7 @@ import { RuleItem } from 'async-validator'
 export {}
 
 declare global {
+  type EmptyObject = Record<string, never>
   type BaseValue = string | number
 
   interface Option {

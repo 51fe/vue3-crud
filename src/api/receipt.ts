@@ -1,40 +1,20 @@
 import { type Receipt } from '../type/receipt'
-import request from '../utils/request'
+import http from '../utils/http'
 
-export function getReceiptList(params: Params): Promise<any> {
-  return request({
-    url: '/receipts',
-    method: 'get',
-    params
-  })
-}
+const url = '/receipts'
+
+export const getReceiptList = (params?: Params) =>
+  http.get<PageTable<Receipt>>(url, { params })
 
 // 新增
-export function addReceipt(data: Receipt): Promise<any> {
-  return request({
-    url: '/receipts',
-    method: 'POST',
-    data
-  })
-}
+export const addReceipt = (data: Receipt) => http.post<Receipt>(url, data)
 
 // 修改
-export function editReceipt(data: Receipt): Promise<any> {
-  const { id } = data
-  return request({
-    url: `/receipts/${id}`,
-    method: 'PUT',
-    data
-  })
-}
+export const editReceipt = (data: Receipt) =>
+  http.put<Receipt>(`${url}/${data?.id}`, data)
 
 // 删除
-export function delReceipt(id: number): Promise<any> {
-  return request({
-    url: `/receipts/${id}`,
-    method: 'DELETE'
-  })
-}
+export const delReceipt = (id: number) => http.delete(`${url}/${id}`)
 
 const receiptApi = {
   getReceiptList,

@@ -6,7 +6,7 @@ import options from './area'
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: number
+    modelValue: number
     placeholder?: string
   }>(),
   {
@@ -31,7 +31,7 @@ const current = computed({
     return props.modelValue
   },
   set: (value) => {
-    emit('update:modelValue', value)
+    emit('update:modelValue', value!)
     const node = areaRef.value.getCheckedNodes()[0] as CascaderNode
     if (node) {
       emit('select', [...Array.from(new Set(node.pathLabels))])
