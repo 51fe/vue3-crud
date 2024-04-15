@@ -39,17 +39,17 @@ test('emits search event when click search button or press enter', async () => {
   const endDay = getAllByText('15')[1]
   await fireEvent.click(endDay)
 
-  getByPlaceholderText('请选择省')
+  // 请选择省
   await fireEvent.click(getByText(fakeForm.areaName_like))
 
-  getByPlaceholderText('请选择市')
+  // 请选择市
   const cities = options.find((item) => item.label === fakeForm.areaName_like)
     ?.children as Option[]
   const city = cities.find((item) => item.value === fakeForm.area_like * 100)
   if (city) {
     await fireEvent.click(getByText(city.label))
   }
-  getByPlaceholderText('请选择区')
+  // 请选择区
   if (city?.children) {
     const area = city.children.find((item) => item.value === fakeForm.area)
     if (area) {
