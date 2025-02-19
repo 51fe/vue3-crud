@@ -1,4 +1,4 @@
-import { fireEvent, screen, render } from '../../test-util'
+import { fireEvent, screen, render, waitFor } from '../../test-util'
 
 import BaseSelect from '../BaseSelect.vue'
 
@@ -36,9 +36,8 @@ const selectMultiple = (arr: string[] = []) => {
 
 test('renders correctly by default', async () => {
   const { html } = setUp()
-  screen.getByPlaceholderText('请选择')
-  await fireEvent.click(screen.getByRole('textbox'))
-  expect(screen.getAllByRole('listitem', { hidden: true })).toHaveLength(
+  await fireEvent.click(screen.getByRole('combobox'))
+  expect(screen.getAllByRole('option')).toHaveLength(
     options.length
   )
   expect(html()).toMatchSnapshot()
@@ -46,22 +45,21 @@ test('renders correctly by default', async () => {
 
 test('changes props and emits input event correctly', async () => {
   const placeholder = '请选择营运商'
-  const { emitted, rerender } = setUp({
+  const { emitted, rerender, container } = setUp({
     placeholder,
     modelValue: 2
   })
-  const inputEl = screen.getByRole('textbox')
-  // change placeholder and current selected
-  await screen.findByPlaceholderText(placeholder)
-  expect(inputEl).toHaveValue('联通')
-
+  await waitFor(() => {
+    expect(container.querySelector('.el-select__placeholder')).toHaveTextContent('联通')
+  })
   //  trigger an update event by clicking the <option> element.
-  await fireEvent.click(inputEl)
-  await fireEvent.click(screen.getAllByRole('listitem', { hidden: true })[2])
+  await fireEvent.click(screen.getByRole('combobox'))
+  const selectedOption = screen.getByRole('option', { name: '电信' })
+  await fireEvent.click(selectedOption)
   expect(emitted()['update:modelValue'][0]).toEqual([3])
   // select 电信
   await rerender({ modelValue: 3 })
-  expect(inputEl).toHaveValue('电信')
+  expect(selectedOption).toHaveClass('is-selected')
 })
 
 test('Passes and returns a string when select multiple items', async () => {
@@ -72,8 +70,8 @@ test('Passes and returns a string when select multiple items', async () => {
   // current selected 移动, 联通
   selectMultiple(['移动', '联通'])
   // add the last one
-  await fireEvent.click(screen.getAllByRole('textbox')[0])
-  await fireEvent.click(screen.getAllByRole('listitem', { hidden: true })[2])
+  await fireEvent.click(screen.getByRole('combobox'))
+  await fireEvent.click(screen.getByText('电信'))
   expect(emitted()['update:modelValue'][0]).toEqual(['1,2,3'])
   // select all
   await rerender({ modelValue: '1,2,3' })

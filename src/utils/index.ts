@@ -6,7 +6,7 @@
  */
 export function parseDateTime(
   time?: Date | string | number,
-  format = '{y}-{m}-{d} {h}:{i}:{s}'
+  format: string = '{y}-{m}-{d} {h}:{i}:{s}'
 ): string | null {
   if (arguments.length === 0 || !time) {
     return null
@@ -102,8 +102,8 @@ export function getAreaNameByCode(list?: Option[], value?: number): string {
 /**
  * 简单深度拷贝
  * @param data
- * @returns {any}
+ * @returns {object}
  */
-export function deepClone(data: object) {
+export function deepClone(data: object): object {
   return JSON.parse(JSON.stringify(data))
 }
